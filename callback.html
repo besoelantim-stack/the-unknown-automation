@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TikTok OAuth Callback</title>
+<style>
+  body {
+    font-family: -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    background: #0f0f0f;
+    color: #eee;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    margin: 0;
+    padding: 20px;
+    box-sizing: border-box;
+  }
+  .card {
+    background: #1c1c1c;
+    border-radius: 12px;
+    padding: 24px;
+    max-width: 480px;
+    width: 100%;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+  }
+  h1 {
+    font-size: 20px;
+    margin-top: 0;
+    color: #ff2d55;
+  }
+  .field {
+    margin-bottom: 16px;
+  }
+  label {
+    display: block;
+    font-size: 13px;
+    color: #999;
+    margin-bottom: 6px;
+  }
+  .value-box {
+    display: flex;
+    gap: 8px;
+    align-items: stretch;
+  }
+  textarea {
+    flex: 1;
+    background: #111;
+    color: #0f0;
+    border: 1px solid #333;
+    border-radius: 8px;
+    padding: 10px;
+    font-family: monospace;
+    font-size: 13px;
+    resize: vertical;
+    min-height: 50px;
+    word-break: break-all;
+  }
+  button {
+    background: #ff2d55;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 0 14px;
+    cursor: pointer;
+    font-size: 13px;
+    white-space: nowrap;
+  }
+  button:active { opacity: 0.7; }
+  .empty {
+    color: #777;
+    font-style: italic;
+    font-size: 14px;
+  }
+  .copied {
+    color: #4caf50;
+    font-size: 12px;
+    margin-top: 4px;
+    display: none;
+  }
+</style>
+</head>
+<body>
+  <div class="card">
+    <h1>نتيجة تسجيل الدخول من TikTok</h1>
+
+    <div class="field">
+      <label>Authorization Code</label>
+      <div class="value-box">
+        <textarea id="codeBox" readonly></textarea>
+        <button onclick="copyText('codeBox','codeCopied')">نسخ</button>
+      </div>
+      <div class="copied" id="codeCopied">تم النسخ ✓</div>
+    </div>
+
+    <div class="field">
+      <label>State</label>
+      <div class="value-box">
+        <textarea id="stateBox" readonly></textarea>
+        <button onclick="copyText('stateBox','stateCopied')">نسخ</button>
+      </div>
+      <div class="copied" id="stateCopied">تم النسخ ✓</div>
+    </div>
+
+    <div class="field" id="errorField" style="display:none;">
+      <label style="color:#ff5555;">Error</label>
+      <div class="value-box">
+        <textarea id="errorBox" readonly style="color:#ff5555;"></textarea>
+      </div>
+    </div>
+  </div>
+
+<script>
+  function getParam(name) {
+    const params = new URLSearchParams(window.location.search);
+    return params.get(name) || '';
+  }
+
+  const code = getParam('code');
+  const state = getParam('state');
+  const error = getParam('error') || getParam('error_description');
+
+  document.getElementById('codeBox').value = code || '';
+  document.getElementById('stateBox').value = state || '';
+
+  if (!code) {
+    document.getElementById('codeBox').placeholder = 'لم يتم استلام كود. تأكد أنك جاي من رابط تسجيل الدخول بتاع TikTok.';
+  }
+
+  if (error) {
+    document.getElementById('errorField').style.display = 'block';
+    document.getElementById('errorBox').value = error;
+  }
+
+  function copyText(boxId, copiedId) {
+    const box = document.getElementById(boxId);
+    box.select();
+    box.setSelectionRange(0, 99999);
+    navigator.clipboard.writeText(box.value).then(() => {
+      const c = document.getElementById(copiedId);
+      c.style.display = 'block';
+      setTimeout(() => c.style.display = 'none', 1500);
+    }).catch(() => {
+      document.execCommand('copy');
+    });
+  }
+</script>
+</body>
+</html>
